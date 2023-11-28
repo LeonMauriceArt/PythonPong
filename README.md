@@ -15,13 +15,13 @@ A simple python pong game running with pygame, with a second version with more g
 
 - Controls :
 	- Left player:
-		Up = W
-		Down = S
-		Use power = D
+		- Up = W
+		- Down = S
+		- Use power = D
 	- Right player:
-		Up = Arrow_up
-		Down = Arrow_down
-		Use power = Arrow_left
+		- Up = Arrow_up
+		- Down = Arrow_down
+		- Use power = Arrow_left
 
 - Powers :
 	- Powers spawn randomly one at a time on the game area
