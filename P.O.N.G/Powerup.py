@@ -1,13 +1,7 @@
-import config
-import Colors
 import random
 import math
 
-from config import *
-from Colors import *
-
 class Powerup:
-
 	def __init__(self, x, y, radius, type):
 		self.x = x
 		self.y = y
@@ -51,4 +45,9 @@ def handle_power_collision(ball, powerup, left_player, right_player):
 			right_player.add_powerup(powerup)
 			return True
 	return False
-			
+
+def power_can_spawn(powerups, last_empty_time):
+	current_time = pygame.time.get_ticks()
+	if not powerups and (current_time - last_empty_time) > POWERUP_SPAWN_INTERVAL * 1000:
+		return True
+	return False

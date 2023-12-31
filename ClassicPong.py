@@ -1,8 +1,8 @@
 import pygame
 pygame.init()
 
-WIDTH, HEIGHT = 700, 500
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN_WIDTH, WIN_HEIGHT = 700, 500
+WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("LeoPong")
 
 FPS = 60
@@ -15,7 +15,7 @@ WINNING_SCORE = 5
 
 SCORE_FONT = pygame.font.SysFont("comicsans", 50)
 
-PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
+PLAYER_WIDTH, PLAYER_HEIGHT = 20, 100
 BALL_RADIUS = 10
 
 #Paddle class
@@ -43,7 +43,7 @@ class Paddle:
 			self.y += self.VEL
 
 	def reset(self):
-		self.y = HEIGHT//2 - PADDLE_HEIGHT//2
+		self.y = WIN_HEIGHT//2 - PLAYER_HEIGHT//2
 
 #Ball class
 class Ball:
@@ -85,18 +85,18 @@ def draw(win, paddles, ball, left_score, right_score):
 	win.fill(BLACK)
 	left_score_text = SCORE_FONT.render(f"{left_score}", 1, WHITE)
 	right_score_text = SCORE_FONT.render(f"{right_score}", 1, WHITE)
-	win.blit(left_score_text, (WIDTH//4 - left_score_text.get_width()//2, 20))
-	win.blit(right_score_text, (WIDTH * (3/4) - right_score_text.get_width()//2, 20))
+	win.blit(left_score_text, (WIN_WIDTH//4 - left_score_text.get_width()//2, 20))
+	win.blit(right_score_text, (WIN_WIDTH * (3/4) - right_score_text.get_width()//2, 20))
 
 	#calling the paddles draw function
 	for paddle in paddles:
 		paddle.draw(win)
 	
 	#Drawing the middle line
-	for i in range (10, HEIGHT, HEIGHT//20):
+	for i in range (10, WIN_HEIGHT, WIN_HEIGHT//20):
 		if i % 2 == 1:
 			continue
-		pygame.draw.rect(win, GREY, (WIDTH//2 - 3, i, 6, HEIGHT//20))
+		pygame.draw.rect(win, GREY, (WIN_WIDTH//2 - 3, i, 6, WIN_HEIGHT//20))
 
 	ball.draw(win)
 
@@ -105,7 +105,7 @@ def draw(win, paddles, ball, left_score, right_score):
 #Handling ball collision
 def handle_ball_collision(ball, left_player, right_player):
 	#Handling ceiling and floor collision
-	if ball.y + ball.radius >= HEIGHT:
+	if ball.y + ball.radius >= WIN_HEIGHT:
 		ball.y_vel *= -1
 	elif ball.y - ball.radius <= 0:
 		ball.y_vel *= -1
@@ -141,12 +141,12 @@ def handle_inputs(keys, left_player, right_player):
 	#Left paddle input
 	if keys[pygame.K_w] and left_player.y - left_player.VEL >= 0:
 		left_player.move(up=True)
-	if keys[pygame.K_s] and left_player.y + left_player.VEL + left_player.height <= HEIGHT:
+	if keys[pygame.K_s] and left_player.y + left_player.VEL + left_player.height <= WIN_HEIGHT:
 		left_player.move(up=False)
 	#Right paddle input
 	if keys[pygame.K_UP] and right_player.y - right_player.VEL >= 0:
 		right_player.move(up=True)
-	if keys[pygame.K_DOWN] and right_player.y + right_player.VEL + right_player.height <= HEIGHT:
+	if keys[pygame.K_DOWN] and right_player.y + right_player.VEL + right_player.height <= WIN_HEIGHT:
 		right_player.move(up=False)
 
 
@@ -155,9 +155,9 @@ def main():
 	run = True
 	clock = pygame.time.Clock()
 
-	left_player = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT)
-	right_player = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT)
-	ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS)
+	left_player = Paddle(10, WIN_HEIGHT//2 - PLAYER_HEIGHT//2, PLAYER_WIDTH, PLAYER_HEIGHT)
+	right_player = Paddle(WIN_WIDTH - 10 - PLAYER_WIDTH, WIN_HEIGHT//2 - PLAYER_HEIGHT//2, PLAYER_WIDTH, PLAYER_HEIGHT)
+	ball = Ball(WIN_WIDTH//2, WIN_HEIGHT//2, BALL_RADIUS)
 
 	left_score = 0
 	right_score = 0
@@ -184,7 +184,7 @@ def main():
 			right_score += 1
 			if right_score < WINNING_SCORE:
 				ball.reset()
-		elif ball.x > WIDTH:
+		elif ball.x > WIN_WIDTH:
 			left_score += 1
 			if left_score < WINNING_SCORE:
 				ball.reset()
