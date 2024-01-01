@@ -1,7 +1,17 @@
 import pygame
-
 import config
-import Main
+from config import (
+	PLAYER_WIDTH,
+	PLAYER_HEIGHT,
+	PLAYER_1_COLOR,
+	PLAYER_2_COLOR,
+	PLAYER_3_COLOR,
+	PLAYER_4_COLOR,
+	POWERUP_CURSE_SIZE,
+	POWERUP_CURSE_DURATION,
+	WINNING_SCORE
+)
+
 
 #Player class
 class Player:
@@ -21,32 +31,31 @@ class Player:
 		self.curse_time_start = 0
 
 	def init_from_pos(self, position):
-		print(WIN_WIDTH, WIN_HEIGHT)
 		if position == "Player 0": #left player
 			self.orientation = 'v'
-			self.x = WIN_WIDTH // 50
-			self.y = WIN_HEIGHT // 2
+			self.x = config.WIN_WIDTH // 50
+			self.y = config.WIN_HEIGHT // 2
 			self.width = PLAYER_WIDTH
 			self.height = PLAYER_HEIGHT
 			self.color = PLAYER_1_COLOR 
 		elif position == "Player 1": #right player
 			self.orientation = 'v'
-			self.x = WIN_WIDTH - WIN_WIDTH // 50
-			self.y = WIN_HEIGHT // 2
+			self.x = config.WIN_WIDTH - config.WIN_WIDTH // 50
+			self.y = config.WIN_HEIGHT // 2
 			self.width = PLAYER_WIDTH
 			self.height = PLAYER_HEIGHT
 			self.color = PLAYER_2_COLOR 
 		elif position == "Player 2" : #bottom player
 			self.orientation = 'h'
-			self.x = WIN_WIDTH // 2
-			self.y = WIN_HEIGHT - WIN_HEIGHT // 50
+			self.x = config.WIN_WIDTH // 2
+			self.y = config.WIN_HEIGHT - config.WIN_HEIGHT // 50
 			self.width = PLAYER_HEIGHT
 			self.height = PLAYER_WIDTH
 			self.color = PLAYER_3_COLOR 
 		elif position == "Player 3" : #top player
 			self.orientation = 'h'
-			self.x = WIN_WIDTH // 2
-			self.y = WIN_HEIGHT // 50
+			self.x = config.WIN_WIDTH // 2
+			self.y = config.WIN_HEIGHT // 50
 			self.width = PLAYER_HEIGHT
 			self.height = PLAYER_WIDTH
 			self.color = PLAYER_4_COLOR 
@@ -60,10 +69,10 @@ class Player:
 		if self.orientation == 'v' :
 			if up and self.y - self.VEL - self.height // 2 >= 0:
 				self.y -= self.VEL
-			elif not up and self.y + self.VEL + self.height // 2 <= WIN_HEIGHT:
+			elif not up and self.y + self.VEL + self.height // 2 <= config.WIN_HEIGHT:
 				self.y += self.VEL
 		elif self.orientation == 'h' :
-			if up and self.x + self.VEL + self.width // 2 <= WIN_WIDTH:
+			if up and self.x + self.VEL + self.width // 2 <= config.WIN_WIDTH:
 				self.x += self.VEL
 			elif not up and self.x - self.VEL - self.width // 2 >= 0:
 				self.x -= self.VEL
@@ -82,11 +91,11 @@ class Player:
 				opponent.y = 0
 
 			# Ensure the rectangle doesn't go below the bottom
-			if opponent.y + opponent.height > WIN_HEIGHT:
-				opponent.y = WIN_HEIGHT - opponent.height
+			if opponent.y + opponent.height > config.WIN_HEIGHT:
+				opponent.y = config.WIN_HEIGHT - opponent.height
 
 	def reset(self):
-		self.y = WIN_HEIGHT//2 - PLAYER_HEIGHT//2
+		self.y = config.WIN_HEIGHT//2 - PLAYER_HEIGHT//2
 
 	def add_powerup(self, powerup):
 		if not self.powerups:
@@ -157,15 +166,15 @@ def handle_score(players, ball):
 	if ball.x < 0:
 		players[0].score += 1
 		ball.reset()
-	elif ball.x > WIN_WIDTH:
+	elif ball.x > config.WIN_WIDTH:
 		players[1].score += 1
 		ball.reset()
 
-	if NUM_OF_PLAYERS > 2:
-		if ball.y > WIN_HEIGHT:
+	if config.NUM_OF_PLAYERS > 2:
+		if ball.y > config.WIN_HEIGHT:
 			players[2].score += 1
 			ball.reset()
-		if NUM_OF_PLAYERS == 4 and ball.y == 0:
+		if config.NUM_OF_PLAYERS == 4 and ball.y == 0:
 			players[3].score += 1
 			ball.reset()
 

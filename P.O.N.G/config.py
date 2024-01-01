@@ -1,12 +1,12 @@
 
+#---WINDOW SETTINGS---
 WIN_WIDTH = 1280
 WIN_HEIGHT = 720
 FPS = 60 
-WIN = None
+WIN = None #used for pygame display
 
 #---RULE SETTINGS---
 WINNING_SCORE = 5
-
 
 #---PLAYERS SETTINGS---
 NUM_OF_PLAYERS = 0

@@ -1,5 +1,10 @@
 import pygame
 
+from config import (
+	POWERUP_WALL_WIDTH,
+	POWERUP_WALL_DURATION,
+	WHITE
+)
 
 class Wall:
 	def __init__(self):

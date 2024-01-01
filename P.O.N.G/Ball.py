@@ -1,5 +1,12 @@
 import pygame 
 
+import config
+
+from config import (
+	BALL_RADIUS,
+	BALL_SPEED,
+	WHITE
+)
 
 #Ball class
 class Ball:
@@ -43,22 +50,9 @@ class Ball:
 
 def handle_ball_collision(ball, players, wall):
     
-	if ball.y + ball.radius >= WIN_HEIGHT or ball.y - ball.radius <= 0: # Handling ceiling and floor collision
+	if ball.y + ball.radius >= config.WIN_HEIGHT or ball.y - ball.radius <= 0: # Handling ceiling and floor collision
 		ball.y_vel *= -1
 
-	# # Wall collision
-	# if ball.x_vel < 0 and ball.x >= WIN_WIDTH // 2 or ball.x_vel > 0 and ball.x <= WIN_WIDTH // 2:
-	# 	if (
-	# 		ball.x - wall.width <= WIN_WIDTH // 2 + wall.width
-	# 		and wall.isActive
-	# 	):
-	# 		ball.x_vel *= -1
-	# 		middle_y = WIN_HEIGHT // 2
-	# 		difference_in_y = middle_y - ball.y
-	# 		reduction_factor = (middle_y / 2) / BALL_SPEED
-	# 		y_vel = difference_in_y / reduction_factor
-	# 		ball.y_vel = -1 * y_vel
-    # Iterate over each player for collision detection
 	for player in players:
 		if player.orientation == 'v' :
 			if ball.y >= player.y - player.height // 2 and ball.y <= player.y + player.height // 2 :
