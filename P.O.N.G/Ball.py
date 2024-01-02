@@ -10,7 +10,6 @@ from config import (
 
 import random
 
-#Ball class
 class Ball:
 	RESET_COOLDOWN = 1500
 
