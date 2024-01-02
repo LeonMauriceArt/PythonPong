@@ -49,9 +49,12 @@ class Ball:
 
 
 def handle_ball_collision(ball, players, wall):
-    
-	if ball.y + ball.radius >= config.WIN_HEIGHT or ball.y - ball.radius <= 0: # Handling ceiling and floor collision
-		ball.y_vel *= -1
+	if config.NUM_OF_PLAYERS == 2:
+		if ball.y + ball.radius >= config.WIN_HEIGHT or ball.y - ball.radius <= 0: # Handling ceiling and floor collision
+			ball.y_vel *= -1
+	if config.NUM_OF_PLAYERS == 3:
+		if ball.y - ball.radius <= 0:
+			ball.y_vel *= -1
 
 	for player in players:
 		if player.orientation == 'v' :
@@ -59,8 +62,16 @@ def handle_ball_collision(ball, players, wall):
 				if ball.x + ball.radius >= player.x - player.width // 2 and ball.x - ball.radius <= player.x + player.width // 2 :
 					ball.x_vel *= -1
 					ball.color = player.color
-					middle_y = player.y + player.height / 2
-					difference_in_y = middle_y - ball.y
+					difference_in_y = player.y - ball.y
 					reduction_factor = (player.height / 2) / BALL_SPEED
 					y_vel = difference_in_y / reduction_factor
 					ball.y_vel = -1 * y_vel
+		elif player.orientation == 'h' :
+			if ball.x >= player.x - player.width // 2 and ball.x <= player.x + player.width // 2 :
+				if ball.y + ball.radius >= player.y - player.height // 2 and ball.y - ball.radius <= player.y + player.height // 2 :
+					ball.y_vel *= -1
+					ball.color = player.color
+					difference_in_x = player.x - ball.x
+					reduction_factor = (player.width / 2) / BALL_SPEED
+					x_vel = difference_in_x / reduction_factor
+					ball.x_vel = -1 * x_vel

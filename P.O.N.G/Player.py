@@ -64,6 +64,9 @@ class Player:
 		# print("---", self.position, " | ", self.orientation, self.x, self.y, self.width, self.height, self.color)
 		pygame.draw.rect(win, self.color, (self.x - self.width // 2, self.y - self.height // 2, self.width, self.height))
 
+	def add_score(self):
+		self.score += 1
+
 	#Move function
 	def move(self, up=True):
 		if self.orientation == 'v' :
@@ -162,24 +165,32 @@ def return_player_to_normal(player):
 		right_player.height = PLAYER_HEIGHT
 		right_player.CURSE_time_start = 0
 
+
+def give_score_by_color(players, color): #add a point to the player with the same color as the ball when it hits a player goal
+	for player in players:
+		if player.color == color:
+			player.add_score()
+			print("point for", player.position)
+			return
+
 def handle_score(players, ball):
 	if ball.x < 0:
-		players[0].score += 1
+		give_score_by_color(players, ball.color)
 		ball.reset()
 	elif ball.x > config.WIN_WIDTH:
-		players[1].score += 1
+		give_score_by_color(players, ball.color)
 		ball.reset()
 
 	if config.NUM_OF_PLAYERS > 2:
 		if ball.y > config.WIN_HEIGHT:
-			players[2].score += 1
+			give_score_by_color(players, ball.color)
 			ball.reset()
-		if config.NUM_OF_PLAYERS == 4 and ball.y == 0:
-			players[3].score += 1
+		if config.NUM_OF_PLAYERS == 4 and ball.y < 0:
+			give_score_by_color(players, ball.color)
 			ball.reset()
 
 	#handle winning
 	for player in players:
 		if player.score == WINNING_SCORE:
-			print("PLAYER", player.position, "WON !")
+			print(player.position, "WON !")
 			return (True)
