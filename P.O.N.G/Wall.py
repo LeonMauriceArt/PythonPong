@@ -1,22 +1,18 @@
 import pygame
 
-from config import (
-	POWERUP_WALL_WIDTH,
-	POWERUP_WALL_DURATION,
-	WHITE
-)
+import config
 
 class Wall:
 	def __init__(self):
-		self.width = POWERUP_WALL_WIDTH 
-		self.color = WHITE
+		self.width = config.POWERUP_WALL_WIDTH 
+		self.color = config.WHITE
 		self.isActive = False
 		self.time_since_active = 0
 
 	#paddle draw function
 	def draw(self, win):
 		if self.isActive:
-			pygame.draw.rect(win, self.color, (WIN_WIDTH//2 - WALL_WIDTH//2, 0, self.width, WIN_HEIGHT))
+			pygame.draw.rect(win, self.color, (config.WIN_WIDTH//2 - config.POWERUP_WALL_WIDTH//2, 0, self.width, config.WIN_HEIGHT))
 
 	def activate(self, color):
 		self.time_since_active = pygame.time.get_ticks()
@@ -26,5 +22,5 @@ class Wall:
 	def update(self):
 		current_time = pygame.time.get_ticks()
 		if self.isActive:
-			if current_time - self.time_since_active >= POWERUP_WALL_DURATION * 1000:
+			if current_time - self.time_since_active >= config.POWERUP_WALL_DURATION * 1000:
 				self.isActive = False

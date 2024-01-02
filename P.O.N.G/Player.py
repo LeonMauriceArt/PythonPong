@@ -61,7 +61,6 @@ class Player:
 			self.color = PLAYER_4_COLOR 
 	
 	def draw(self, win): #player draw function
-		# print("---", self.position, " | ", self.orientation, self.x, self.y, self.width, self.height, self.color)
 		pygame.draw.rect(win, self.color, (self.x - self.width // 2, self.y - self.height // 2, self.width, self.height))
 
 	def add_score(self):
@@ -80,22 +79,17 @@ class Player:
 			elif not up and self.x - self.VEL - self.width // 2 >= 0:
 				self.x -= self.VEL
 
-	def curse_opponent(self, opponent):
-		if opponent.height != POWERUP_CURSE_SIZE:
-			# Calculate the amount by which the rectangle should expand
-			expansion_amount = POWERUP_CURSE_SIZE - opponent.height
-
-			# Expand the rectangle both upwards and downwards
-			opponent.y -= expansion_amount // 2
-			opponent.height += expansion_amount
-
-			# Ensure the rectangle doesn't go above the top
-			if opponent.y < 0:
-				opponent.y = 0
-
-			# Ensure the rectangle doesn't go below the bottom
-			if opponent.y + opponent.height > config.WIN_HEIGHT:
-				opponent.y = config.WIN_HEIGHT - opponent.height
+	def curse_players(self, players):
+		for player in players:
+			if player.position != self.position :
+				if player.height != POWERUP_CURSE_SIZE:
+					expansion_amount = POWERUP_CURSE_SIZE - player.height
+					player.y -= expansion_amount // 2
+					player.height += expansion_amount
+					if player.y < 0:
+						player.y = 0
+					if player.y + player.height > config.WIN_HEIGHT:
+						player.y = config.WIN_HEIGHT - player.height
 
 	def reset(self):
 		self.y = config.WIN_HEIGHT//2 - PLAYER_HEIGHT//2
@@ -105,20 +99,22 @@ class Player:
 			print("Player as acquired the", powerup.type, "power !")
 			self.powerups.append(powerup)
 	
-	def use_powerup(self, player, wall, ball, opponent):
+	def use_powerup(self, wall, ball, players):
 		if self.powerups:
-			if (self.powerups[0].type == POWERUP_WALL and not wall.isActive):
-				self.powerups[0].printuse(player)
+			if (self.powerups[0].type == config.POWERUP_WALL and not wall.isActive):
+				print(self.position, "is using wall power!")
 				wall.activate(self.color)
 				self.powerups.pop(0)
-			elif self.powerups[0].type == POWERUP_REVERSE:
-				self.powerups[0].printuse(player)
+			elif self.powerups[0].type == config.POWERUP_REVERSE:
+				print(self.position, "is using reverse power!")
 				ball.reverse_effect()
 				self.powerups.pop(0)
-			elif self.powerups[0].type == POWERUP_CURSE:
-				self.powerups[0].printuse(player)
-				opponent.curse_time_start = pygame.time.get_ticks()
-				self.curse_opponent(opponent)
+			elif self.powerups[0].type == config.POWERUP_CURSE:
+				print(self.position, "is using curse power!")
+				for player in players :
+					if player.position != self.position :
+						player.curse_time_start = pygame.time.get_ticks()
+				self.curse_players(players)
 				self.powerups.pop(0)
 
 	def update(self):
@@ -128,7 +124,7 @@ class Player:
 				retract_amount = POWERUP_CURSE_SIZE - PLAYER_HEIGHT
 				self.y += retract_amount // 2
 				self.height -= retract_amount
-				self.CURSE_time_start = 0
+				self.curse_time_start = 0
 
 
 #Handling key pressing for paddle movement
@@ -150,21 +146,9 @@ def handle_inputs(keys, players, ball, wall):
 		for player in players:
 			if player.orientation == 'h':
 				player.move(up=True)
-
-	#---POWERUP USAGE NEED TO BE REWORKED---
-	# if keys[pygame.K_SPACE]:
-	# 	for player in players:
-	# 		player.use_powerup()
-
-def return_player_to_normal(player):
-	current_time = pygame.time.get_ticks()
-	if left_player.height == POWERUP_CURSE_SIZE and (current_time - left_player.CURSE_time_start) >= POWERUP_CURSE_DURATION * 1000:
-		left_player.height = PLAYER_HEIGHT
-		left_player.CURSE_time_start = 0
-	if right_player.height == POWERUP_CURSE_SIZE and (current_time - right_player.CURSE_time_start) >= POWERUP_CURSE_DURATION * 1000:
-		right_player.height = PLAYER_HEIGHT
-		right_player.CURSE_time_start = 0
-
+	if keys[pygame.K_SPACE]:
+		for player in players:
+			player.use_powerup(wall, ball, players)
 
 def give_score_by_color(players, color): #add a point to the player with the same color as the ball when it hits a player goal
 	for player in players:

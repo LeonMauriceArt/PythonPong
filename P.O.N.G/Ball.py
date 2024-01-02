@@ -8,6 +8,8 @@ from config import (
 	WHITE
 )
 
+import random
+
 #Ball class
 class Ball:
 	RESET_COOLDOWN = 1500
@@ -29,7 +31,13 @@ class Ball:
 
 	def	reset(self):
 		self.wait_start = pygame.time.get_ticks()
-		self.direction = (self.x_vel * -1)
+		up_or_side = random.choice([0, 1])
+		if up_or_side == 0 :
+			self.direction_y = random.choice([BALL_SPEED * -1, BALL_SPEED])
+			self.direction_x = 0
+		elif up_or_side == 1 :
+			self.direction_x = random.choice([BALL_SPEED * -1, BALL_SPEED])
+			self.direction_y = 0
 		self.color = WHITE
 		self.x_vel = 0
 		self.y_vel = 0
@@ -41,12 +49,13 @@ class Ball:
 		self.y_vel *= -1
 
 	def update(self):
-		if self.x_vel == 0:
+		if self.x_vel == 0 and self.y_vel == 0:
 			current_time = pygame.time.get_ticks()
 			if current_time - self.wait_start >= self.RESET_COOLDOWN:
-				self.x_vel = self.direction
-				self.direction = 0
-
+				self.x_vel = self.direction_x
+				self.y_vel = self.direction_y
+				self.direction_x = 0
+				self.direction_y = 0
 
 def handle_ball_collision(ball, players, wall):
 	if config.NUM_OF_PLAYERS == 2:

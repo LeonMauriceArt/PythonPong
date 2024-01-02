@@ -6,6 +6,7 @@ import config
 from Player import Player, handle_inputs, handle_score
 from Ball import Ball, handle_ball_collision
 from Wall import Wall
+from Powerup import Powerup, spawn_power, handle_power_collision, power_can_spawn
 
 #draw function to update the display of the background, players and everything else
 def draw(win, players, ball, powerups, wall):
@@ -43,6 +44,10 @@ def main():
 	config.NUM_OF_PLAYERS = get_num_of_players()
 	if config.NUM_OF_PLAYERS > 2:
 		config.WIN_WIDTH = config.WIN_HEIGHT # if there is more than 2 player, the game area should be a square
+		config.SPAWN_MIN_X = config.WIN_WIDTH // 4
+		config.SPAWN_MAX_X = config.WIN_WIDTH - config.WIN_WIDTH // 4
+		config.SPAWN_MIN_Y = config.WIN_HEIGHT // 4
+		config.SPAWN_MAX_Y = config.WIN_HEIGHT - config.WIN_HEIGHT // 4
 	config.WIN = pygame.display.set_mode((config.WIN_WIDTH, config.WIN_HEIGHT)) # pygame window init
 	pygame.display.set_caption("P.O.N.G")
 
@@ -71,18 +76,19 @@ def main():
 				run = False
 				break
 
-		# if power_can_spawn(powerups, last_empty_time):
-		# 	powerups.append(spawn_power()) 
 
 		keys = pygame.key.get_pressed()
 		handle_inputs(keys, players, ball, wall)
 		ball.move()
 		handle_ball_collision(ball, players, wall)
 
-		# if powerups:
-		# 	if handle_power_collision(ball, powerups[0], left_player, right_player):
-		# 		powerups.pop(0)
-		# 		last_empty_time = pygame.time.get_ticks()
+		if config.POWERUP_ENABLE :
+			if power_can_spawn(powerups, last_empty_time):
+				powerups.append(spawn_power()) 
+			if powerups:
+				if handle_power_collision(ball, powerups[0], players):
+					powerups.pop(0)
+					last_empty_time = pygame.time.get_ticks()
 
 		ball.update()
 		wall.update()
