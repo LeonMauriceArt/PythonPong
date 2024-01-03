@@ -96,21 +96,17 @@ class Player:
 
 	def add_powerup(self, powerup):
 		if not self.powerups:
-			print("Player as acquired the", powerup.type, "power !")
 			self.powerups.append(powerup)
 	
 	def use_powerup(self, wall, ball, players):
 		if self.powerups:
 			if (self.powerups[0].type == config.POWERUP_WALL and not wall.isActive):
-				print(self.position, "is using wall power!")
 				wall.activate(self.color)
 				self.powerups.pop(0)
 			elif self.powerups[0].type == config.POWERUP_REVERSE:
-				print(self.position, "is using reverse power!")
 				ball.reverse_effect()
 				self.powerups.pop(0)
 			elif self.powerups[0].type == config.POWERUP_CURSE:
-				print(self.position, "is using curse power!")
 				for player in players :
 					if player.position != self.position :
 						player.curse_time_start = pygame.time.get_ticks()
@@ -127,9 +123,7 @@ class Player:
 				self.curse_time_start = 0
 
 
-#Handling key pressing for paddle movement
-def handle_inputs(keys, players, ball, wall):
-	#Left paddle input
+def handle_inputs(keys, players, ball, wall): #Handling key pressing for player movement and action
 	if keys[pygame.K_UP] :
 		for player in players:
 			if player.orientation == 'v':
@@ -154,7 +148,6 @@ def give_score_by_color(players, color): #add a point to the player with the sam
 	for player in players:
 		if player.color == color:
 			player.add_score()
-			print("point for", player.position)
 			return
 
 def handle_score(players, ball):
@@ -167,7 +160,8 @@ def handle_score(players, ball):
 
 	if config.NUM_OF_PLAYERS > 2:
 		if ball.y > config.WIN_HEIGHT:
-			give_score_by_color(players, ball.color)
+			if ball.color != players[2].color :
+				give_score_by_color(players, ball.color)
 			ball.reset()
 		if config.NUM_OF_PLAYERS == 4 and ball.y < 0:
 			give_score_by_color(players, ball.color)
