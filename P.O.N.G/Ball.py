@@ -21,12 +21,12 @@ class Ball:
 		self.x_vel = BALL_SPEED
 		self.y_vel = 0
 		self.color = color
+		self.has_bounced_wall = False
 
 	def draw(self, win):
 		pygame.draw.circle(win, self.color, (self.x, self.y),self.radius)
 
 	def move(self):
-		# print("Ball:", "x_vel", self.x_vel,"|", "y_vel", self.y_vel, end="\r")
 		self.x += self.x_vel
 		self.y += self.y_vel
 
@@ -49,8 +49,10 @@ class Ball:
 		self.y = self.original_y
 
 	def reverse_effect(self):
-		self.x_vel *= -1
-		self.y_vel *= -1
+		if abs(self.x_vel) < abs(self.y_vel):	
+			self.x_vel *= -1
+		if abs(self.y_vel) < abs(self.x_vel):	
+			self.y_vel *= -1
 
 	def update(self):
 		if self.x_vel == 0 and self.y_vel == 0:
@@ -62,18 +64,26 @@ class Ball:
 				self.direction_y = 0
 
 def handle_ball_collision(ball, players, wall):
-    if config.NUM_OF_PLAYERS == 2:
-        if ball.y + ball.radius >= config.WIN_HEIGHT or ball.y - ball.radius <= 0:
-            ball.y_vel *= -1
-    elif config.NUM_OF_PLAYERS == 3:
-        if ball.y - ball.radius <= 0:
-            ball.y_vel *= -1
-    for player in players:
-        if player.orientation == 'v':
-            handle_vertical_collision(ball, player)
-        elif player.orientation == 'h':
-            handle_horizontal_collision(ball, player)
+	if wall.isActive:
+		handle_wall_collision(ball, wall)
+	if config.NUM_OF_PLAYERS == 2:
+		if ball.y + ball.radius >= config.WIN_HEIGHT and ball.y_vel > 0 or ball.y - ball.radius <= 0 and ball.y_vel < 0:
+			ball.y_vel *= -1
+	elif config.NUM_OF_PLAYERS == 3:
+		if ball.y - ball.radius <= 0:
+			ball.y_vel *= -1
+	for player in players:
+		if player.orientation == 'v':
+			handle_vertical_collision(ball, player)
+		elif player.orientation == 'h':
+			handle_horizontal_collision(ball, player)
 
+def handle_wall_collision(ball, wall):
+	if ball.x >= config.WIN_WIDTH // 2 - wall.width // 2 and ball.x <= config.WIN_WIDTH // 2 + wall.width // 2 :
+		if not ball.has_bounced_wall :
+			ball.x_vel *= -1
+			ball.has_bounced_wall = True
+		
 
 def handle_vertical_collision(ball, player):
     if ball.y >= player.y - player.height // 2 and ball.y <= player.y + player.height // 2:
@@ -88,36 +98,17 @@ def handle_horizontal_collision(ball, player):
             if ball.y > config.WIN_HEIGHT // 2 and ball.y_vel > 0 or ball.y < config.WIN_HEIGHT // 2 and ball.y_vel < 0:
                 update_ball_velocity(ball, player, 'h')
 
-def ball_is_in_corners(ball):
-	if ball.x >= 0 and ball.x <= config.WIN_WIDTH // 6 and ball.y >= 0 and ball.y <= config.WIN_HEIGHT // 6:
-		print("top left corner")
-		return True
-	if ball.x >= 0 and ball.x <= config.WIN_WIDTH // 6 and ball.y >= config.WIN_HEIGHT - config.WIN_HEIGHT // 6 and ball.y <= config.WIN_HEIGHT :
-		print("bottom left corner")
-		return True
-	if ball.x >= config.WIN_WIDTH - config.WIN_WIDTH // 6 and ball.x <= config.WIN_WIDTH and ball.y >= 0 and ball.y <= config.WIN_HEIGHT // 6:
-		print("top right corner")
-		return True
-	if ball.x >= config.WIN_WIDTH - config.WIN_WIDTH // 6 and ball.x <= config.WIN_WIDTH and ball.y >= config.WIN_HEIGHT - config.WIN_HEIGHT // 6 and ball.y <= config.WIN_HEIGHT:
-		print("bottom right corner")
-		return True
-	return False
-
-
 def update_ball_velocity(ball, player, axis):
-	print("------------")
 	ball.color = player.color
 
 	if axis == 'h':
 		ball.y_vel *= -1
 		difference_in_x = player.x - ball.x
-		print(difference_in_x)
 		reduction_factor = (float(player.width) / 2) / BALL_SPEED
 		ball.x_vel = -difference_in_x / reduction_factor
 	elif axis == 'v':
 		ball.x_vel *= -1
 		difference_in_y = player.y - ball.y
-		print(difference_in_y)
 		reduction_factor = (float(player.height) / 2) / BALL_SPEED
 		ball.y_vel = -difference_in_y / reduction_factor
 
@@ -125,6 +116,3 @@ def update_ball_velocity(ball, player, axis):
 	vel = math.sqrt(ball.x_vel*ball.x_vel + ball.y_vel*ball.y_vel);
 	ball.x_vel *= BALL_SPEED/vel
 	ball.y_vel *= BALL_SPEED/vel
-
-	print("ball vel : ", "xvel", ball.x_vel, " | yvel", ball.y_vel)
-	print("------------")

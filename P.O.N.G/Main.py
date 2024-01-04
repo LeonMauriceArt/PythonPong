@@ -91,7 +91,7 @@ def main():
 					last_empty_time = pygame.time.get_ticks()
 
 		ball.update()
-		wall.update()
+		wall.update(ball)
 		for player in players:
 			player.update()
 

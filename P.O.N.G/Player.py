@@ -82,17 +82,16 @@ class Player:
 	def curse_players(self, players):
 		for player in players:
 			if player.position != self.position :
-				if player.height != POWERUP_CURSE_SIZE:
-					expansion_amount = POWERUP_CURSE_SIZE - player.height
-					player.y -= expansion_amount // 2
-					player.height += expansion_amount
-					if player.y < 0:
-						player.y = 0
-					if player.y + player.height > config.WIN_HEIGHT:
-						player.y = config.WIN_HEIGHT - player.height
+				if player.orientation == 'v' :
+					player.height = POWERUP_CURSE_SIZE
+				elif player.orientation == 'h' :
+					player.width = POWERUP_CURSE_SIZE
 
 	def reset(self):
-		self.y = config.WIN_HEIGHT//2 - PLAYER_HEIGHT//2
+		if self.orientation == 'v' :
+			self.y = config.WIN_HEIGHT//2
+		else :
+			self.x = config.WIN_WIDTH//2
 
 	def add_powerup(self, powerup):
 		if not self.powerups:
@@ -115,13 +114,21 @@ class Player:
 
 	def update(self):
 		current_time = pygame.time.get_ticks()
-		if self.height == POWERUP_CURSE_SIZE:
+		if self.height == POWERUP_CURSE_SIZE and self.orientation == 'v' or self.width == POWERUP_CURSE_SIZE and self.orientation == 'h': #if players are cursed, check for timer and revert there size back if duration is over
 			if current_time - self.curse_time_start >= POWERUP_CURSE_DURATION * 1000:
-				retract_amount = POWERUP_CURSE_SIZE - PLAYER_HEIGHT
-				self.y += retract_amount // 2
-				self.height -= retract_amount
+				if self.orientation == 'v':
+					self.height = PLAYER_HEIGHT
+					if self.y - PLAYER_HEIGHT // 2 < 0 :
+						self.y = PLAYER_HEIGHT // 2
+					if self.y + PLAYER_HEIGHT // 2 > config.WIN_HEIGHT :
+						self.y = config.WIN_HEIGHT - PLAYER_HEIGHT // 2
+				else:
+					self.width = PLAYER_HEIGHT
+					if self.x - PLAYER_HEIGHT // 2 < 0 :
+						self.x = PLAYER_HEIGHT // 2
+					if self.x + PLAYER_HEIGHT // 2 > config.WIN_WIDTH :
+						self.x = config.WIN_WIDTH - PLAYER_HEIGHT // 2
 				self.curse_time_start = 0
-
 
 def handle_inputs(keys, players, ball, wall): #Handling key pressing for player movement and action
 	if keys[pygame.K_UP] :
@@ -148,6 +155,7 @@ def give_score_by_color(players, color): #add a point to the player with the sam
 	for player in players:
 		if player.color == color:
 			player.add_score()
+			print(player.position, "scored a point, currently at", player.score)
 			return
 
 def handle_score(players, ball):

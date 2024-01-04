@@ -19,8 +19,9 @@ class Wall:
 		self.color = color
 		self.isActive = True
 
-	def update(self):
+	def update(self, ball):
 		current_time = pygame.time.get_ticks()
 		if self.isActive:
 			if current_time - self.time_since_active >= config.POWERUP_WALL_DURATION * 1000:
 				self.isActive = False
+				ball.has_bounced_wall = False
