@@ -44,7 +44,7 @@ Elle entre ensuite dans la boucle de jeu, où elle met à jour et rend continuel
 ## Boucle de Jeu
 
 La boucle de jeu itère continuellement, gérant les entrées des joueurs, mettant à jour les positions des joueurs et de la balle, détectant les collisions et gérant les powerups. 
-La boucle se termine lorsqu'un joueur marque un point et que la fenêtre Pygame est fermée.
+La boucle se termine lorsqu'un joueur marque suffisament de points (en accordance avec une variable definie dans config.py).
 
 ## Powerups
 
