@@ -25,13 +25,18 @@ python pong_game.py [nombre_de_joueurs]
 ## Structure du Code
 
 Le code est organisé en plusieurs fichiers :
+
     - config.py : Contient des constantes de configuration pour le jeu.
+
     - Player.py : Définit la classe Player et des fonctions pour gérer la logique liée aux joueurs.
+
     - Ball.py : Implémente la classe Ball et des fonctions pour gérer le mouvement de la balle et les collisions.
+
     - Wall.py : Définit la classe Wall responsable de la gestion des limites du jeu.
+    
     - Powerup.py : Contient des fonctions et des classes pour gérer les powerups dans le jeu.
 
-Logique Principale
+## Logique Principale
 
 La fonction main initialise la fenêtre Pygame et configure l'environnement de jeu. 
 Elle entre ensuite dans la boucle de jeu, où elle met à jour et rend continuellement l'état du jeu.
@@ -44,6 +49,7 @@ La boucle se termine lorsqu'un joueur marque un point et que la fenêtre Pygame 
 ## Powerups
 
 Le jeu inclut des powerups (config.POWERUP_ENABLE). Les powerups apparaissent à des intervalles aléatoires et disparaissent lorsqu'ils entrent en collision avec la raquette d'un joueur. Les effets effets sont les suivants :
+
     - REVERSE : Fait une feinte de la balle, qui change de direction.
     - WALL : Fait apparaitre un mur au centre de l'arene pendant un court instant.
     - CURSE : Maudit les joueurs pendant un instant, diminuant la taille de leurs racquettes.
