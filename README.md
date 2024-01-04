@@ -3,7 +3,7 @@
 ## Aperçu
 
 Il s'agit d'une implémentation simple du jeu classique Pong en utilisant la bibliothèque Pygame en Python. 
-Le jeu prend en charge de 2 à 4 joueurs et inclut des fonctionnalités telles que des powerups et une balle rebondissante.
+Le jeu prend en charge de 2 à 4 joueurs et inclut des fonctionnalités telles que des powerups.
 
 ## Configuration
 
@@ -16,7 +16,7 @@ pip install pygame
 
 ## Utilisation
 
-Pour exécuter le jeu, lancez le script depuis la ligne de commande avec un argument facultatif spécifiant le nombre de joueurs (2 à 4). Si aucun argument n'est fourni, la valeur par défaut est fixée à 2 joueurs.
+Pour exécuter le jeu, lancez le script depuis la ligne de commande avec un argument facultatif spécifiant le nombre de joueurs (2 à 4). Si aucun argument n'est fourni, la valeur par défaut est fixée à 2 joueurs. Si la valeur est superieur a 4, le nombre de joueur sera fixer a 4.
 
 ```bash
 python pong_game.py [nombre_de_joueurs]
@@ -32,8 +32,8 @@ Le code est organisé en plusieurs fichiers :
 
     - Ball.py : Implémente la classe Ball et des fonctions pour gérer le mouvement de la balle et les collisions.
 
-    - Wall.py : Définit la classe Wall responsable de la gestion des limites du jeu.
-    
+    - Wall.py : Définit la classe Wall, utilisee pour le powerup mur.
+
     - Powerup.py : Contient des fonctions et des classes pour gérer les powerups dans le jeu.
 
 ## Logique Principale
