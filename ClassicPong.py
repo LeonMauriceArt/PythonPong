@@ -11,9 +11,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (100,100,100)
 
-WINNING_SCORE = 5
-
-SCORE_FONT = pygame.font.SysFont("comicsans", 50)
+WINNING_SCORE = 3
 
 PLAYER_WIDTH, PLAYER_HEIGHT = 20, 100
 BALL_RADIUS = 10
@@ -83,21 +81,10 @@ class Ball:
 #draw function to update the display of the background, paddles and everything else
 def draw(win, paddles, ball, left_score, right_score):
 	win.fill(BLACK)
-	left_score_text = SCORE_FONT.render(f"{left_score}", 1, WHITE)
-	right_score_text = SCORE_FONT.render(f"{right_score}", 1, WHITE)
-	win.blit(left_score_text, (WIN_WIDTH//4 - left_score_text.get_width()//2, 20))
-	win.blit(right_score_text, (WIN_WIDTH * (3/4) - right_score_text.get_width()//2, 20))
 
-	#calling the paddles draw function
 	for paddle in paddles:
 		paddle.draw(win)
 	
-	#Drawing the middle line
-	for i in range (10, WIN_HEIGHT, WIN_HEIGHT//20):
-		if i % 2 == 1:
-			continue
-		pygame.draw.rect(win, GREY, (WIN_WIDTH//2 - 3, i, 6, WIN_HEIGHT//20))
-
 	ball.draw(win)
 
 	pygame.display.update()
@@ -191,11 +178,7 @@ def main():
 		
 		#handle winning
 		if left_score >= WINNING_SCORE or right_score >= WINNING_SCORE:
-			left_score = 0
-			right_score = 0
-			left_player.reset()
-			right_player.reset()
-			ball.reset()
+			break
 
 	pygame.quit()
 
