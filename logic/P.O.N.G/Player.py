@@ -59,9 +59,6 @@ class Player:
 			self.width = PLAYER_HEIGHT
 			self.height = PLAYER_WIDTH
 			self.color = PLAYER_4_COLOR 
-	
-	def draw(self, win): #player draw function
-		pygame.draw.rect(win, self.color, (self.x - self.width // 2, self.y - self.height // 2, self.width, self.height))
 
 	def add_score(self):
 		self.score += 1
