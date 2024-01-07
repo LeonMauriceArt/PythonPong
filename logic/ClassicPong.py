@@ -1,186 +1,170 @@
-import pygame
-pygame.init()
 
-WIN_WIDTH, WIN_HEIGHT = 700, 500
-WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("LeoPong")
+import asyncio
 
-FPS = 60
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GREY = (100,100,100)
+from django.db import models
 
 WINNING_SCORE = 3
-
 PLAYER_WIDTH, PLAYER_HEIGHT = 20, 100
 BALL_RADIUS = 10
+BALL_SPEED = 10
+PLAYER_SPEED = 6
+BALL_RESET_COOLDOWN = 1500
 
 #Paddle class
-class Paddle:
-	#Color of the paddle
-	COLOR = WHITE
+class Player:
 	#Movement speed of the paddle
-	VEL = 6
+	def __init__(self, x, y, window):
+		self.xpos = x
+		self.ypos = y
+		self.width = PLAYER_WIDTH
+		self.height = PLAYER_HEIGHT
+		self.vel = PLAYER_SPEED
+		self.score = 0
 
-	def __init__(self, x, y, width, height):
-		self.x = x
-		self.y = y
-		self.width = width
-		self.height = height
+	def move_up(self):
+		if self.ypos - self.height//2 >= 0:
+			self.ypos -= self.vel
 
-	#paddle draw function
-	def draw(self, win):
-		pygame.draw.rect(win, self.COLOR, (self.x, self.y, self.width, self.height))
-
-	#Move function
-	def move(self, up=True):
-		if up:
-			self.y -= self.VEL
-		else:
-			self.y += self.VEL
+	def move_down(self, window):
+		if self.ypos + self.height//2 <= window.height
+			self.ypos += self.vel
 
 	def reset(self):
-		self.y = WIN_HEIGHT//2 - PLAYER_HEIGHT//2
+		self.ypos = window.height//2
+
+	def add_score(self):
+		self.score += 1
+
+    def collides_with(self, ball):
+        # Simplified collision check with AABB (Axis-Aligned Bounding Box)
+        return (self.xpos < ball.xpos + ball.radius and
+                self.xpos + self.width > ball.xpos - ball.radius and
+                self.ypos < ball.ypos + ball.radius and
+                self.ypos + self.height > ball.ypos - ball.radius)
+
+    def to_dict(self):
+        return {
+            'xpos': self.xpos,
+            'ypos': self.ypos,
+            'width': self.width,
+            'height': self.height
+        }
 
 #Ball class
 class Ball:
-	MAX_VEL = 10
-	RESET_COOLDOWN = 1500
-	COLOR = WHITE
-
-	def __init__(self, x, y, radius):
-		self.x = self.original_x = x
-		self.y = self.original_y = y
-		self.radius = radius
-		self.x_vel = self.MAX_VEL
+	def __init__(self, x, y):
+		self.xpos = self.original_x = x
+		self.ypos = self.original_y = y
+		self.radius = BALL_RADIUS
+		self.max_vel = BALL_SPEED
+		self.x_vel = self.max_vel
 		self.y_vel = 0
 
-	def draw(self, win):
-		pygame.draw.circle(win, self.COLOR, (self.x, self.y),self.radius)
-
 	def move(self):
-		self.x += self.x_vel
-		self.y += self.y_vel
+		self.xpos += self.x_vel
+		self.ypos += self.y_vel
 
 	def	reset(self):
-		self.wait_start = pygame.time.get_ticks()
 		self.direction = (self.x_vel * -1)
 		self.x_vel = 0
 		self.y_vel = 0
-		self.x = self.original_x
-		self.y = self.original_y
+		self.xpos = self.original_x
+		self.ypos = self.original_y
+		await asyncio.sleep(2)
+		await self.start_after_reset()
 
-	def update(self):
-		if self.x_vel == 0:
-			current_time = pygame.time.get_ticks()
-			if current_time - self.wait_start >= self.RESET_COOLDOWN:
-				self.x_vel = self.direction
-				self.direction = 0
+	async def start_after_reset(self):
+		self.x_vel = self.direction
+		self.direction = 0
 
-#draw function to update the display of the background, paddles and everything else
-def draw(win, paddles, ball, left_score, right_score):
-	win.fill(BLACK)
+    def reflect_vertical(self):
+        self.y_vel = -self.y_vel
 
-	for paddle in paddles:
-		paddle.draw(win)
-	
-	ball.draw(win)
+	#Handling ball collision
+	def handle_ball_collision(self, player):
+		ball.x_vel *= -1
+		middle_y = player.ypos + player.height / 2
+		difference_in_y = middle_y - ball.y
+		reduction_factor = (player.height / 2) / ball.MAX_VEL
+		y_vel = difference_in_y / reduction_factor
+		ball.y_vel = -1 * y_vel
 
-	pygame.display.update()
+class Window:
+    def __init__(self, width, height):
+        self.width, self.height = width, height
 
-#Handling ball collision
-def handle_ball_collision(ball, left_player, right_player):
-	#Handling ceiling and floor collision
-	if ball.y + ball.radius >= WIN_HEIGHT:
-		ball.y_vel *= -1
-	elif ball.y - ball.radius <= 0:
-		ball.y_vel *= -1
+    def to_dict(self):
+        return {
+            'width': self.width,
+            'height': self.height
+        }
 
-	#Handling left paddle collision with ball
-	if ball.x_vel < 0:
-		if ball.y >= left_player.y and ball.y <= left_player.y + left_player.height:
-			if ball.x - ball.radius <= left_player.x + left_player.width:
-				#ball is hitting and bouncing off the left paddle
-				ball.x_vel *= -1
-				#handling ball y direction based on where it hits
-				middle_y = left_player.y + left_player.height / 2
-				difference_in_y = middle_y - ball.y
-				reduction_factor = (left_player.height / 2) / ball.MAX_VEL
-				y_vel = difference_in_y / reduction_factor
-				ball.y_vel = -1 * y_vel
-	#Handling right paddle collision with ball
-	else:
-		if ball.y >= right_player.y and ball.y <= right_player.y + right_player.height:
-			if ball.x + ball.radius >= right_player.x:
-				#ball is hitting and bouncing off the right paddle
-				ball.x_vel *= -1
-				#handling ball y direction based on where it hits
-				middle_y = right_player.y + right_player.height / 2
-				difference_in_y = middle_y - ball.y
-				reduction_factor = (right_player.height / 2) / ball.MAX_VEL
-				y_vel = difference_in_y / reduction_factor
-				ball.y_vel = -1 * y_vel
+class Game:
+    def __init__(self, window):
+        self.window = window
+        self.reset_game()
+        print('Game initialized')
 
+    def reset_game(self):
+        self.players = {0: None, 1: None}
+        self.player1 = Player(50, ypos=self.window.height / 2)
+        self.player2 = Player(xpos=self.window.width - 50, ypos=self.window.height / 2)
+        self.ball = Ball(xpos=self.window.width / 2, ypos=self.window.height / 2)
+        self.pause_game = True
+        self.running = False
 
-#Handling key pressing for paddle movement
-def handle_inputs(keys, left_player, right_player):
-	#Left paddle input
-	if keys[pygame.K_w] and left_player.y - left_player.VEL >= 0:
-		left_player.move(up=True)
-	if keys[pygame.K_s] and left_player.y + left_player.VEL + left_player.height <= WIN_HEIGHT:
-		left_player.move(up=False)
-	#Right paddle input
-	if keys[pygame.K_UP] and right_player.y - right_player.VEL >= 0:
-		right_player.move(up=True)
-	if keys[pygame.K_DOWN] and right_player.y + right_player.VEL + right_player.height <= WIN_HEIGHT:
-		right_player.move(up=False)
+    def loop(self):
+        if not self.pause_game:
+            self.ball.move()
+            self.check_collisions()
 
+    def move_player(self, player, direction):
+        if player == 1:
+            if direction == 'up':
+                self.player1.move_up()
+            elif direction == 'down':
+                self.player1.move_down(self.window)
+        elif player == 2:
+            if direction == 'up':
+                self.player2.move_up()
+            elif direction == 'down':
+                self.player2.move_down(self.window)
 
-#Main function
-def main():
-	run = True
-	clock = pygame.time.Clock()
+    def check_collisions(self):
+        # Player and ball collision
+        if self.player1.collides_with(self.ball):
+            self.ball.handle_ball_collision(self.player1)
+            self.ball.xpos = self.player1.xpos + self.player1.width + self.ball.radius
 
-	left_player = Paddle(10, WIN_HEIGHT//2 - PLAYER_HEIGHT//2, PLAYER_WIDTH, PLAYER_HEIGHT)
-	right_player = Paddle(WIN_WIDTH - 10 - PLAYER_WIDTH, WIN_HEIGHT//2 - PLAYER_HEIGHT//2, PLAYER_WIDTH, PLAYER_HEIGHT)
-	ball = Ball(WIN_WIDTH//2, WIN_HEIGHT//2, BALL_RADIUS)
+        if self.player2.collides_with(self.ball):
+            self.ball.handle_ball_collision(self.player2)
+            self.ball.xpos = self.player2.xpos - self.ball.radius
 
-	left_score = 0
-	right_score = 0
+        if self.ball.ypos - self.ball.radius <= 0 or self.ball.ypos + self.ball.radius >= self.window.height:
+            self.ball.reflect_vertical()
 
-#Game loop
-	while run :
-		clock.tick(FPS)
-		draw(WIN, [left_player, right_player], ball, left_score, right_score)
+        if self.ball.xpos - self.ball.radius <= 0 or self.ball.xpos + self.ball.radius >= self.window.width:
+			self.ball.reset()
+            self.handle_score()
 
-		for event in pygame.event.get ():
-			if event.type == pygame.QUIT:
-				run = False
-				break
+	def handle_score(self):
+		if self.ball.xpos - self.ball.radius <= 0:
+			self.player2.add_score()
+		if self.ball.xpos + self.ball.radius >= self.window.width:
+			self.player1.add_score()
+		if self.player1.score == WINNING_SCORE or self.player2.score == WINNING_SCORE:
+			if self.player1.score == WINNING_SCORE:
+				print("Player 1 won !")
+			else:
+				print("Player 2 won !")
+			self.running = False
+			self.pause_game = True
 
-		keys = pygame.key.get_pressed()
-		handle_inputs(keys, left_player, right_player)
-		ball.move()
-		handle_ball_collision(ball, left_player, right_player)
-
-		ball.update()
-		
-		#handle score
-		if ball.x < 0:
-			right_score += 1
-			if right_score < WINNING_SCORE:
-				ball.reset()
-		elif ball.x > WIN_WIDTH:
-			left_score += 1
-			if left_score < WINNING_SCORE:
-				ball.reset()
-		
-		#handle winning
-		if left_score >= WINNING_SCORE or right_score >= WINNING_SCORE:
-			break
-
-	pygame.quit()
-
-if __name__ == '__main__':
-	main()
+    def get_state(self):
+        return {
+            'window': self.window.to_dict(),
+            'player1': self.player1.to_dict(),
+            'player2': self.player2.to_dict(),
+            'ball': self.ball.to_dict(),
+            'pause': self.pause_game
+        }
