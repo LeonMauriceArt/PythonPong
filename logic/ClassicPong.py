@@ -84,7 +84,7 @@ class Ball:
 	def handle_ball_collision(self, player):
 		self.x_vel *= -1
 		middle_y = player.ypos + player.height / 2
-		difference_in_y = middle_y - self.y
+		difference_in_y = middle_y - self.ypos
 		reduction_factor = (player.height / 2) / self.max_vel
 		y_vel = difference_in_y / reduction_factor
 		self.y_vel = -1 * y_vel
