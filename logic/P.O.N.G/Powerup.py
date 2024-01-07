@@ -5,10 +5,10 @@ import config
 import random
 
 class Powerup:
-	def __init__(self, x, y, radius, type):
-		self.x = x
-		self.y = y
-		self.radius = radius
+	def __init__(self, x, y, type):
+		self.xpos = x
+		self.ypos = y
+		self.radius = config.POWERUP_RADIUS
 		self.type = type
 		self.color = self.getColorType()
 
@@ -20,8 +20,14 @@ class Powerup:
 		elif self.type == config.POWERUP_CURSE:
 			return (0, 255, 255)
 
-	def draw(self, win):
-		pygame.draw.circle(win, self.color, (self.x, self.y),self.radius)
+	def handle_power_collision(self, ball, players):
+		distance = math.sqrt((ball.x - powerup.x)**2 + (ball.y - powerup.y)**2)
+		if distance <= (ball.radius + powerup.radius):
+			for player in players :
+				if ball.color == player.color and not player.powerups:
+					player.add_powerup(powerup)
+					return True
+		return False
 
 def spawn_power():
 	types = [config.POWERUP_REVERSE, config.POWERUP_CURSE, config.POWERUP_WALL]
@@ -31,15 +37,6 @@ def spawn_power():
 	newpower = Powerup(newpower_x_pos, newpower_y_pos, config.POWERUP_RADIUS, types[newpower_type])
 	return newpower
 
-
-def handle_power_collision(ball, powerup, players):
-	distance = math.sqrt((ball.x - powerup.x)**2 + (ball.y - powerup.y)**2)
-	if distance <= (ball.radius + powerup.radius):
-		for player in players :
-			if ball.color == player.color and not player.powerups:
-				player.add_powerup(powerup)
-				return True
-	return False
 
 def power_can_spawn(powerups, last_empty_time):
 	current_time = pygame.time.get_ticks()

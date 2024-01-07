@@ -12,7 +12,6 @@ from config import (
 	WINNING_SCORE
 )
 
-
 #Player class
 class Player:
 	#Movement speed of the paddle
@@ -33,29 +32,29 @@ class Player:
 	def init_from_pos(self, position):
 		if position == "Player 0": #left player
 			self.orientation = 'v'
-			self.x = config.WIN_WIDTH // 50
-			self.y = config.WIN_HEIGHT // 2
+			self.xpos = config.WIN_WIDTH // 50
+			self.ypos = config.WIN_HEIGHT // 2
 			self.width = PLAYER_WIDTH
 			self.height = PLAYER_HEIGHT
 			self.color = PLAYER_1_COLOR 
 		elif position == "Player 1": #right player
 			self.orientation = 'v'
-			self.x = config.WIN_WIDTH - config.WIN_WIDTH // 50
-			self.y = config.WIN_HEIGHT // 2
+			self.xpos = config.WIN_WIDTH - config.WIN_WIDTH // 50
+			self.ypos = config.WIN_HEIGHT // 2
 			self.width = PLAYER_WIDTH
 			self.height = PLAYER_HEIGHT
 			self.color = PLAYER_2_COLOR 
 		elif position == "Player 2" : #bottom player
 			self.orientation = 'h'
-			self.x = config.WIN_WIDTH // 2
-			self.y = config.WIN_HEIGHT - config.WIN_HEIGHT // 50
+			self.xpos = config.WIN_WIDTH // 2
+			self.ypos = config.WIN_HEIGHT - config.WIN_HEIGHT // 50
 			self.width = PLAYER_HEIGHT
 			self.height = PLAYER_WIDTH
 			self.color = PLAYER_3_COLOR 
 		elif position == "Player 3" : #top player
 			self.orientation = 'h'
-			self.x = config.WIN_WIDTH // 2
-			self.y = config.WIN_HEIGHT // 50
+			self.xpos = config.WIN_WIDTH // 2
+			self.ypos = config.WIN_HEIGHT // 50
 			self.width = PLAYER_HEIGHT
 			self.height = PLAYER_WIDTH
 			self.color = PLAYER_4_COLOR 
@@ -63,18 +62,21 @@ class Player:
 	def add_score(self):
 		self.score += 1
 
-	#Move function
-	def move(self, up=True):
-		if self.orientation == 'v' :
-			if up and self.y - self.VEL - self.height // 2 >= 0:
-				self.y -= self.VEL
-			elif not up and self.y + self.VEL + self.height // 2 <= config.WIN_HEIGHT:
-				self.y += self.VEL
-		elif self.orientation == 'h' :
-			if up and self.x + self.VEL + self.width // 2 <= config.WIN_WIDTH:
-				self.x += self.VEL
-			elif not up and self.x - self.VEL - self.width // 2 >= 0:
-				self.x -= self.VEL
+	def move_up(self):
+		if self.orientation = 'v':
+			if self.ypos - self.height//2 >= 0:
+				self.ypos -= self.vel
+		else:
+			if self.xpos - self.width//2 >= 0:
+				self.xpos -= self.vel
+
+	def move_down(self, window):
+		if self.orientation = 'v':
+			if self.ypos + self.height//2 <= window.height:
+				self.ypos += self.vel
+		else:
+			if self.xpos + self.width//2 <= window.width:
+				self.xpos += self.vel
 
 	def curse_players(self, players):
 		for player in players:
@@ -84,11 +86,11 @@ class Player:
 				elif player.orientation == 'h' :
 					player.width = POWERUP_CURSE_SIZE
 
-	def reset(self):
+	def reset(self, window):
 		if self.orientation == 'v' :
-			self.y = config.WIN_HEIGHT//2
+			self.y = window.height//2
 		else :
-			self.x = config.WIN_WIDTH//2
+			self.x = window.width//2
 
 	def add_powerup(self, powerup):
 		if not self.powerups:
@@ -109,8 +111,14 @@ class Player:
 				self.curse_players(players)
 				self.powerups.pop(0)
 
+	def collides_with(self, ball):
+		# Simplified collision check with AABB (Axis-Aligned Bounding Box)
+		return (self.xpos < ball.xpos + ball.radius and
+				self.xpos + self.width > ball.xpos - ball.radius and
+				self.ypos < ball.ypos + ball.radius and
+				self.ypos + self.height > ball.ypos - ball.radius)
+
 	def update(self):
-		current_time = pygame.time.get_ticks()
 		if self.height == POWERUP_CURSE_SIZE and self.orientation == 'v' or self.width == POWERUP_CURSE_SIZE and self.orientation == 'h': #if players are cursed, check for timer and revert there size back if duration is over
 			if current_time - self.curse_time_start >= POWERUP_CURSE_DURATION * 1000:
 				if self.orientation == 'v':
@@ -127,33 +135,7 @@ class Player:
 						self.x = config.WIN_WIDTH - PLAYER_HEIGHT // 2
 				self.curse_time_start = 0
 
-def handle_inputs(keys, players, ball, wall): #Handling key pressing for player movement and action
-	if keys[pygame.K_UP] :
-		for player in players:
-			if player.orientation == 'v':
-				player.move(up=True)
-	if keys[pygame.K_DOWN] :
-		for player in players:
-			if player.orientation == 'v':
-				player.move(up=False)	
-	if keys[pygame.K_LEFT] :
-		for player in players:
-			if player.orientation == 'h':
-				player.move(up=False)
-	if keys[pygame.K_RIGHT] :
-		for player in players:
-			if player.orientation == 'h':
-				player.move(up=True)
-	if keys[pygame.K_SPACE]:
-		for player in players:
-			player.use_powerup(wall, ball, players)
 
-def give_score_by_color(players, color): #add a point to the player with the same color as the ball when it hits a player goal
-	for player in players:
-		if player.color == color:
-			player.add_score()
-			print(player.position, "scored a point, currently at", player.score)
-			return
 
 def handle_score(players, ball):
 	if ball.x < 0:
