@@ -113,10 +113,3 @@ class Ball:
 			'y_speed': self.y_vel,
 			'radius': self.radius,
 		}
-
-	def give_score_by_color(self, players): #add a point to the player with the same color as the ball when it hits a player goal
-		for player in players:
-			if player.color == self.color:
-				player.add_score()
-				print(player.position, "scored a point, currently at", player.score)
-				return

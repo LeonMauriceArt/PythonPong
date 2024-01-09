@@ -1,4 +1,3 @@
-
 import asyncio
 
 from django.db import models
@@ -9,7 +8,6 @@ BALL_RADIUS = 10
 BALL_SPEED = 10
 PLAYER_SPEED = 6
 BALL_RESET_COOLDOWN = 1500
-PLAYER_BORDER_GAP = 50
 
 #Paddle class
 class Player:
@@ -65,16 +63,11 @@ class Ball:
 		self.xpos += self.x_vel
 		self.ypos += self.y_vel
 
-	async def reset(self):
+	def reset(self):
 		self.direction = (self.x_vel * -1)
-		self.x_vel = 0
-		self.y_vel = 0
 		self.xpos = self.original_x
 		self.ypos = self.original_y
-		await asyncio.sleep(2)
-		await self.start_after_reset()
-
-	async def start_after_reset(self):
+		self.y_vel = 0
 		self.x_vel = self.direction
 		self.direction = 0
 
@@ -84,8 +77,7 @@ class Ball:
 	#Handling ball collision
 	def handle_ball_collision(self, player):
 		self.x_vel *= -1
-		middle_y = player.ypos + player.height / 2
-		difference_in_y = middle_y - self.ypos
+		difference_in_y = player.ypos - self.ypos
 		reduction_factor = (player.height / 2) / self.max_vel
 		y_vel = difference_in_y / reduction_factor
 		self.y_vel = -1 * y_vel
@@ -154,8 +146,8 @@ class Game:
 			self.ball.reflect_vertical()
 
 		if self.ball.xpos - self.ball.radius <= 0 or self.ball.xpos + self.ball.radius >= self.window.width:
-			self.ball.reset()
 			self.handle_score()
+			self.ball.reset()
 
 	def handle_score(self):
 		if self.ball.xpos - self.ball.radius <= 0:

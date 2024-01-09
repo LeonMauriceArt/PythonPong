@@ -17,8 +17,8 @@ class Player:
 	#Movement speed of the paddle
 	VEL = 5
 	orientation = None	#h for horizontal, v for vertical
-	x = None
-	y = None
+	xpos = None
+	ypos = None
 	width = None
 	height = None
 	color = None
@@ -135,27 +135,10 @@ class Player:
 						self.x = config.WIN_WIDTH - PLAYER_HEIGHT // 2
 				self.curse_time_start = 0
 
-
-
-def handle_score(players, ball):
-	if ball.x < 0:
-		give_score_by_color(players, ball.color)
-		ball.reset()
-	elif ball.x > config.WIN_WIDTH:
-		give_score_by_color(players, ball.color)
-		ball.reset()
-
-	if config.NUM_OF_PLAYERS > 2:
-		if ball.y > config.WIN_HEIGHT:
-			if ball.color != players[2].color :
-				give_score_by_color(players, ball.color)
-			ball.reset()
-		if config.NUM_OF_PLAYERS == 4 and ball.y < 0:
-			give_score_by_color(players, ball.color)
-			ball.reset()
-
-	#handle winning
-	for player in players:
-		if player.score == WINNING_SCORE:
-			print(player.position, "WON !")
-			return (True)
+	def to_dict(self):
+		return {
+			'xpos': self.xpos,
+			'ypos': self.ypos,
+			'width': self.width,
+			'height': self.height
+		}
